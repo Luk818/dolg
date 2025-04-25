@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Elements</title>
+    <style>
+        /* Стили для формы и кнопки */
+        .error {
+            border: 3px solid rgb(255, 71, 71);
+        }
+
+        button:hover {
+            color: rgb(255, 255, 255);
+            background-color: #616467;
+        }
+    </style>
+</head>
+<body>
+    <h1>l1-interactive-elements-v1</h1>
+    <form class="input-validation">
+        <label for="equation">Введите выражение с двумя однозначными операндами:</label>
+        <input type="text" id="equation" maxlength="3" name="equation">
+        <button type="submit">Вычислить</button>
+        <p class="error-output"></p>
+        <p class="result"></p>
+    </form>
+
+    <script>
+        // Функция для проверки корректности выражения
+        function validateEquation(equation) {
+            const operators = ['+', '-', '*', '/'];
+            const hasOperator = operators.some(op => equation.includes(op));
+
+            if (!hasOperator) {
+                return 'в выражении должны использоваться только операторы +, -, /, *';
+            }
+
+            const parts = equation.split(/[+-*/]/);
+            const operands = parts.filter(part => part.trim() !== '');
+
+            if (operands.length !== 2) {
+                return 'не хватает одного или нескольких операндов';
+            }
+
+            for (const operand of operands) {
+                if (!/^d$/.test(operand)) {
+                    return 'операнды могут быть только числами';
+                }
+            }
+
+            return '';
+        }
+
+        // Функция для вычисления выражения
+        function calcEquation(equation) {
+            const error = validateEquation(equation);
+            if (error) {
+                return '';
+            }
+
+            const result = eval(equation);
+            return result.toString();
+        }
+
+        // Обработка события отправки формы
+        document.querySelector('.input-validation').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const equationInput = document.getElementById('equation');
+            const errorOutput = document.querySelector('.error-output');
+            const resultOutput = document.querySelector('.result');
+
+            const equation = equationInput.value;
+
+            const validationError = validateEquation(equation);
+            
+            if (validationError) {
+                errorOutput.textContent = validationError;
+                equationInput.classList.add('error');
+                resultOutput.textContent = '';
+                return;
+            } else {
+                errorOutput.textContent = '';
+                equationInput.classList.remove('error');
+            }
+
+            const result = calcEquation(equation);
+            
+            resultOutput.textContent = result !== '' ? result : 'Некорректное выражение';
+        });
+    </script>
+</body>
+</html>
